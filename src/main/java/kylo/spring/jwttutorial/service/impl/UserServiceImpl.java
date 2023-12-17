@@ -18,14 +18,14 @@ public class UserServiceImpl implements UserService {
     // userRepository.findByEmail(email)를 통해 사용자를 조회하고 있습니다.
     // 이 메서드는 UserDetails를 구현한 객체를 반환하고 있습니다.
     // 이 객체에서 getUsername() 메서드를 호출하면 해당 사용자의 이메일 값이 반환될 것입니다.
-    @Override
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-                return userRepository.findByEmail(email)
-                        .orElseThrow(()-> new UsernameNotFoundException("User not found"));
-            }
-        };
-    }
+//    @Override
+//    public UserDetailsService userDetailsService() {
+//        return new UserDetailsService() {
+//            @Override
+//            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+//                return userRepository.findByEmail(email)
+//                        .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+//            }
+//        };
+//    }
 }

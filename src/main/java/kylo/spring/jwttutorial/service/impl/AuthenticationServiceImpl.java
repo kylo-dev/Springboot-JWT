@@ -1,5 +1,6 @@
 package kylo.spring.jwttutorial.service.impl;
 
+import kylo.spring.jwttutorial.config.auth.PrincipalDetails;
 import kylo.spring.jwttutorial.dto.JwtAuthenticationResponse;
 import kylo.spring.jwttutorial.dto.RefreshTokenRequest;
 import kylo.spring.jwttutorial.dto.SignUpRequest;
@@ -48,8 +49,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findByEmail(signinRequest.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
-        String token = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
+        PrincipalDetails principalDetails = new PrincipalDetails(user);
+
+        String token = jwtService.generateToken(principalDetails);
+        String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), principalDetails);
 
         return JwtAuthenticationResponse.builder()
                 .token(token)
@@ -58,12 +61,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     public JwtAuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
-        String userEmail = jwtService.extractUsername(refreshTokenRequest.getToken());
+        String userEmail = jwtService.extractEmail(refreshTokenRequest.getToken());
+
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(()-> new IllegalArgumentException("Invalid email or password"));
 
-        if (jwtService.isTokenValid(refreshTokenRequest.getToken(), user)){
-            String newToken = jwtService.generateToken(user);
+        PrincipalDetails principalDetails = new PrincipalDetails(user);
+
+        if (jwtService.isTokenValid(refreshTokenRequest.getToken(), principalDetails)){
+            String newToken = jwtService.generateToken(principalDetails);
 
             return JwtAuthenticationResponse.builder()
                     .token(newToken)

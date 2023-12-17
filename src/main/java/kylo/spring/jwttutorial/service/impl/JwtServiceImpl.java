@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import kylo.spring.jwttutorial.jwt.JwtProperties;
 import kylo.spring.jwttutorial.service.JwtService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername()) // UserDetails.getUsername()은 사용자 식별값을 반환함 (= email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 86400))
+                .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .signWith(getSignatureKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -31,17 +32,17 @@ public class JwtServiceImpl implements JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 86400))
+                .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .signWith(getSignatureKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     private Key getSignatureKey() {
-        byte[] key = Decoders.BASE64.decode("4jhhaskjdfbkj131231anbfsadfsdfasadfr3243431314134asdfsdfaafsd");
+        byte[] key = Decoders.BASE64.decode(JwtProperties.SECRET);
         return Keys.hmacShaKeyFor(key);
     }
 
@@ -64,8 +65,8 @@ public class JwtServiceImpl implements JwtService {
 
     // Token 유효한지 확인하기
     public boolean isTokenValid(String token, UserDetails userDetails){
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String email = extractEmail(token);
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     // Token 만료기간 확인하기

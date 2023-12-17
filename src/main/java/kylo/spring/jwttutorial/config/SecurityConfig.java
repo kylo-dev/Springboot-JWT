@@ -1,5 +1,6 @@
 package kylo.spring.jwttutorial.config;
 
+import kylo.spring.jwttutorial.config.auth.PrincipalDetailsService;
 import kylo.spring.jwttutorial.entity.Role;
 import kylo.spring.jwttutorial.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserService userService;
+    private final PrincipalDetailsService principalDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,7 +55,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userService.userDetailsService());
+        authenticationProvider.setUserDetailsService(principalDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return authenticationProvider;
